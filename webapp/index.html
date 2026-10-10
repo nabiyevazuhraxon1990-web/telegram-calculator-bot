@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Telegram Mini App Kalkulyator</title>
+  
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container" id="app">
+    <!-- Header Section -->
+    <header class="app-header">
+      <div class="user-badge" id="userBadge">
+        <div class="user-avatar" id="userAvatar">🧮</div>
+        <div class="user-info">
+          <span class="user-greeting" id="userGreeting">Xush kelibsiz!</span>
+          <span class="user-name" id="userName">Foydalanuvchi</span>
+        </div>
+      </div>
+      
+      <!-- Mode Tabs -->
+      <nav class="mode-tabs">
+        <button class="tab-btn active" id="tabStandard" data-tab="standard">
+          <span>🔢 Standart</span>
+        </button>
+        <button class="tab-btn" id="tabScientific" data-tab="scientific">
+          <span>🔬 Ilmiy</span>
+        </button>
+        <button class="tab-btn" id="tabHistory" data-tab="history">
+          <span>📜 Tarix</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Calculator Screen / Display -->
+    <section class="display-panel">
+      <div class="display-glass">
+        <!-- Status indicator (Angle unit: DEG/RAD) -->
+        <div class="display-status">
+          <button class="angle-toggle" id="angleToggle">DEG</button>
+          <span class="calc-indicator" id="calcIndicator">Aqlli Kalkulyator</span>
+        </div>
+
+        <!-- Upper expression line -->
+        <div class="expression-line" id="expressionLine" title="Kiritilgan ifoda">0</div>
+
+        <!-- Main result line -->
+        <div class="result-line" id="resultLine">
+          <span class="equal-sign" id="equalSign">=</span>
+          <span class="result-value" id="resultValue">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Keypad Views Container -->
+    <main class="keypad-container">
+      
+      <!-- 1. STANDART KEYPAD -->
+      <div class="keypad active" id="standardKeypad">
+        <div class="grid-row">
+          <button class="btn btn-fn" id="btnClear">C</button>
+          <button class="btn btn-fn" data-insert="(">(</button>
+          <button class="btn btn-fn" data-insert=")">)</button>
+          <button class="btn btn-fn btn-backspace" id="btnBackspace">⌫</button>
+        </div>
+        <div class="grid-row">
+          <button class="btn btn-num" data-insert="7">7</button>
+          <button class="btn btn-num" data-insert="8">8</button>
+          <button class="btn btn-num" data-insert="9">9</button>
+          <button class="btn btn-op" data-op="÷">÷</button>
+        </div>
+        <div class="grid-row">
+          <button class="btn btn-num" data-insert="4">4</button>
+          <button class="btn btn-num" data-insert="5">5</button>
+          <button class="btn btn-num" data-insert="6">6</button>
+          <button class="btn btn-op" data-op="×">×</button>
+        </div>
+        <div class="grid-row">
+          <button class="btn btn-num" data-insert="1">1</button>
+          <button class="btn btn-num" data-insert="2">2</button>
+          <button class="btn btn-num" data-insert="3">3</button>
+          <button class="btn btn-op" data-op="−">−</button>
+        </div>
+        <div class="grid-row">
+          <button class="btn btn-num" data-insert="0">0</button>
+          <button class="btn btn-num" data-insert=".">.</button>
+          <button class="btn btn-fn" data-op="%">%</button>
+          <button class="btn btn-op" data-op="+">+</button>
+        </div>
+        <div class="grid-row bottom-row">
+          <button class="btn btn-action" id="btnSendToChat" title="Natijani bot chatiga yuborish">
+            <span class="icon">✈️</span>
+            <span>Chatga yuborish</span>
+          </button>
+          <button class="btn btn-equal" id="btnEqual">=</button>
+        </div>
+      </div>
+
+      <!-- 2. ILMIY (SCIENTIFIC) KEYPAD -->
+      <div class="keypad" id="scientificKeypad">
+        <div class="grid-row">
+          <button class="btn btn-sci" data-insert="sin(">sin</button>
+          <button class="btn btn-sci" data-insert="cos(">cos</button>
+          <button class="btn btn-sci" data-insert="tan(">tan</button>
+          <button class="btn btn-sci" data-insert="√(">√x</button>
+        </div>
+        <div class="grid-row">
+          <button class="btn btn-sci" data-insert="^2">x²</button>
+          <button class="btn btn-sci" data-insert="^">xʸ</button>
+          <button class="btn btn-sci" data-insert="!">n!</button>
+          <button class="btn btn-sci" data-insert="abs(">|x|</button>
+        </div>
+        <div class="grid-row">
+          <button class="btn btn-sci" data-insert="log10(">log</button>
+          <button class="btn btn-sci" data-insert="log(">ln</button>
+          <button class="btn btn-sci" data-insert="pi">π</button>
+          <button class="btn btn-sci" data-insert="e">e</button>
+        </div>
+        <div class="grid-row">
+          <button class="btn btn-fn" data-insert="(">(</button>
+          <button class="btn btn-fn" data-insert=")">)</button>
+          <button class="btn btn-fn" id="btnSciClear">C</button>
+          <button class="btn btn-fn btn-backspace" id="btnSciBackspace">⌫</button>
+        </div>
+        <div class="grid-row bottom-row">
+          <button class="btn btn-action" id="btnSciSendToChat">
+            <span class="icon">✈️</span>
+            <span>Chatga yuborish</span>
+          </button>
+          <button class="btn btn-equal" id="btnSciEqual">=</button>
+        </div>
+      </div>
+
+      <!-- 3. TARIX (HISTORY TAPE) VIEW -->
+      <div class="history-view" id="historyView">
+        <div class="history-header">
+          <span>Oxirgi hisoblar</span>
+          <button class="btn-clear-history" id="btnClearHistory">🗑 Tarixni tozalash</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="history-empty" id="historyEmpty">
+            <span class="empty-icon">📜</span>
+            <p>Hozircha hech qanday hisob-kitob mavjud emas.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Quick Toast Notification -->
+    <div class="toast" id="toastMessage">Nusxa olindi!</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

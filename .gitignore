@@ -1,0 +1,24 @@
+# Muhit o'zgaruvchilari va maxfiy ma'lumotlar (Bot tokeni)
+.env
+*.env
+
+# Python kesh va baytkod
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual muhitlar
+venv/
+.venv/
+env/
+ENV/
+
+# Tizim fayllari
+.DS_Store
+Thumbs.db
+
+# IDE sozlamalari
+.idea/
+.vscode/
+*.swp

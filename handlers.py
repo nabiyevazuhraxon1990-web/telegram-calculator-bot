@@ -15,10 +15,22 @@ from aiogram.types import (
     Message,
 )
 
+from aiogram.exceptions import TelegramBadRequest
+
 from calculator import SafeCalculator
 import keyboards
 
 router = Router()
+
+
+async def safe_edit_text(message: Message, text: str, reply_markup=None) -> None:
+    """Xabar o'zgarmagan bo'lsa TelegramBadRequest xatosini xavfsiz o'tkazib yuborish."""
+    try:
+        await message.edit_text(text=text, reply_markup=reply_markup)
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e).lower():
+            raise
+
 
 # ==========================================
 # SEANSI VA TARIXNI XOTIRADA SAQLASH
@@ -249,7 +261,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
     # 1. Rejimni almashtirish
     if action == "mode_sci":
         session["mode"] = "sci"
-        await callback.message.edit_text(
+        await safe_edit_text(
+            callback.message,
             render_display(session),
             reply_markup=keyboards.get_calc_inline_keyboard(mode="sci"),
         )
@@ -258,7 +271,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
 
     elif action == "mode_std":
         session["mode"] = "std"
-        await callback.message.edit_text(
+        await safe_edit_text(
+            callback.message,
             render_display(session),
             reply_markup=keyboards.get_calc_inline_keyboard(mode="std"),
         )
@@ -270,7 +284,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
         session["expr"] = ""
         session["last_result"] = None
         session["just_evaluated"] = False
-        await callback.message.edit_text(
+        await safe_edit_text(
+            callback.message,
             render_display(session),
             reply_markup=keyboards.get_calc_inline_keyboard(mode=mode),
         )
@@ -291,7 +306,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
                 else:
                     session["expr"] = session["expr"][:-1].rstrip()
 
-        await callback.message.edit_text(
+        await safe_edit_text(
+            callback.message,
             render_display(session),
             reply_markup=keyboards.get_calc_inline_keyboard(mode=mode),
         )
@@ -315,7 +331,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
             add_to_history(user_id, expr, result)
             await callback.answer(f"Natija: {result}")
 
-        await callback.message.edit_text(
+        await safe_edit_text(
+            callback.message,
             render_display(session),
             reply_markup=keyboards.get_calc_inline_keyboard(mode=mode),
         )
@@ -348,7 +365,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
         else:
             session["expr"] = expr + token
 
-        await callback.message.edit_text(
+        await safe_edit_text(
+            callback.message,
             render_display(session),
             reply_markup=keyboards.get_calc_inline_keyboard(mode=mode),
         )
@@ -366,7 +384,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
         else:
             session["expr"] = expr.rstrip() + op_symbol
 
-        await callback.message.edit_text(
+        await safe_edit_text(
+            callback.message,
             render_display(session),
             reply_markup=keyboards.get_calc_inline_keyboard(mode=mode),
         )
@@ -383,7 +402,8 @@ async def handle_calc_callback(callback: CallbackQuery) -> None:
     else:
         session["expr"] = expr + action
 
-    await callback.message.edit_text(
+    await safe_edit_text(
+        callback.message,
         render_display(session),
         reply_markup=keyboards.get_calc_inline_keyboard(mode=mode),
     )
@@ -446,7 +466,8 @@ async def handle_clear_history_cb(callback: CallbackQuery) -> None:
     user_id = callback.from_user.id
     user_histories[user_id] = []
     await callback.answer("Tarix tozalandi!", show_alert=True)
-    await callback.message.edit_text(
+    await safe_edit_text(
+        callback.message,
         "🗑 <b>Hisoblashlar tarixi muvaffaqiyatli tozalandi!</b>",
         reply_markup=keyboards.get_history_inline_keyboard(),
     )
